@@ -97,6 +97,7 @@ add_action( 'after_setup_theme', 'testscores_content_width', 0 );
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
+
 function testscores_widgets_init() {
 	register_sidebar( array(
 		'name'          => esc_html__( 'Sidebar', 'testscores' ),
@@ -108,7 +109,7 @@ function testscores_widgets_init() {
 		'after_title'   => '</h2>',
 	) );
         
-//        Add a second widget as an example of how it is done
+//        Add a second widget as an example
                 register_sidebar( array(
 		'name'          => __( 'Content Bottom 1', 'testscores' ),
 		'id'            => 'sidebar-2',
@@ -126,8 +127,12 @@ add_action( 'widgets_init', 'testscores_widgets_init' );
  */
 function testscores_scripts() {
 	wp_enqueue_style( 'testscores-style', get_stylesheet_uri() );
-
-	wp_enqueue_script( 'testscores-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
+        
+        // Add Google Fonts - Fira Sans & Merriweather
+        
+        wp_enqueue_script('testscores-google-fonts','https://fonts.googleapis.com/css?family=Fira+Sans:400,400italic,700,700italic|Merriweather:400,400italic,700,700italic');
+        
+               	wp_enqueue_script( 'testscores-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
 
 	wp_enqueue_script( 'testscores-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
