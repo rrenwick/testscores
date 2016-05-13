@@ -87,10 +87,10 @@ add_action( 'after_setup_theme', 'testscores_setup' );
  *
  * @global int $content_width
  */
-function testscores_content_width() {
-	$GLOBALS['content_width'] = apply_filters( 'testscores_content_width', 640 );
-}
-add_action( 'after_setup_theme', 'testscores_content_width', 0 );
+//function testscores_content_width() {
+//	$GLOBALS['content_width'] = apply_filters( 'testscores_content_width', 640 );
+//}
+//add_action( 'after_setup_theme', 'testscores_content_width', 0 );
 
 /**
  * Register widget area.
