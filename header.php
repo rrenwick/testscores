@@ -39,9 +39,13 @@
                                         <div class="screen-reader-text">
                                             <?php printf( esc_html__('Go to the home page of %1$s', 'popperscores'), $site_title ); ?>	
                                         </div>
+                                        <?php if ( has_custom_logo() ) {
+                                            the_custom_logo();
+                                        } else { ?>                                            
                                         <div class="site-firstletter" aria-hidden="true">
                                                     <?php echo substr($site_title, 0, 1); ?>
                                         </div>
+                                        <?php } ?>                                        
                                     </a>
            
                                 </div>

@@ -21,6 +21,14 @@
  * @uses testscores_header_style()
  */
 function testscores_custom_header_setup() {
+    
+                  add_theme_support( 'custom-logo', array(
+                      'width'=> 96,
+                      'height' => 96,
+                      'flex-width' => false,
+                      'flex-height' => false,
+                  ));
+                  
 	add_theme_support( 'custom-header', apply_filters( 'testscores_custom_header_args', array(
 		'default-image'          => '',
 		'default-text-color'     => 'ffffff',
