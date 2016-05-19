@@ -136,8 +136,11 @@ function testscores_scripts() {
         
         wp_enqueue_style('local-fonts', get_template_directory_uri() . '/fonts/custom-fonts.css');
         
-               	wp_enqueue_script( 'testscores-navigation', get_template_directory_uri() . '/js/navigation.js', array(), '20151215', true );
-
+               	wp_enqueue_script( 'testscores-navigation', get_template_directory_uri() . '/js/navigation.js', array( 'jquery'), '20151215', true );
+                 wp_localize_script( 'testscores-navigation', 'screenReaderText', array(
+		'expand'   => '<span class="screen-reader-text">' . __( 'expand child menu', 'testscores' ) . '</span>',
+		'collapse' => '<span class="screen-reader-text">' . __( 'collapse child menu', 'testscores' ) . '</span>',
+	) );
 	wp_enqueue_script( 'testscores-skip-link-focus-fix', get_template_directory_uri() . '/js/skip-link-focus-fix.js', array(), '20151215', true );
 
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
