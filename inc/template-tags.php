@@ -25,7 +25,7 @@ function testscores_posted_on() {
 	);
 
 	$posted_on = sprintf(
-		esc_html_x( 'Posted on %s', 'post date', 'testscores' ),
+		esc_html_x( 'Published on %s', 'post date', 'testscores' ),
 		'<a href="' . esc_url( get_permalink() ) . '" rel="bookmark">' . $time_string . '</a>'
 	);
 
@@ -34,8 +34,21 @@ function testscores_posted_on() {
 		'<span class="author vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ) . '">' . esc_html( get_the_author() ) . '</a></span>'
 	);
 
-	echo '<span class="posted-on">' . $posted_on . '</span><span class="byline"> ' . $byline . '</span>'; // WPCS: XSS OK.
-
+        
+        	// Display the author avatar if the author has a Gravatar
+	$author_id = get_the_author_meta( 'ID' );
+	if ( testscores_validate_gravatar( $author_id ) ) {
+		echo '<div class="author-avatar">' . get_avatar( $author_id ) . '</div>';
+	}
+     
+                echo '<span class="byline"> ' . $byline . '</span><span class="posted-on">' . $posted_on . '</span>'; // WPCS: XSS OK.
+	
+                if ( ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
+		echo '<span class="comments-link">';
+		comments_popup_link( esc_html__( 'Leave a comment', 'testscores' ), esc_html__( '1 Comment', 'testscores' ), esc_html__( '% Comments', 'testscores' ) );
+		echo '</span>';
+	}
+        
 }
 endif;
 
@@ -59,12 +72,12 @@ function testscores_entry_footer() {
 		}
 	}
 
-	if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
-		echo '<span class="comments-link">';
-		/* translators: %s: post title */
-		comments_popup_link( sprintf( wp_kses( __( 'Leave a Comment<span class="screen-reader-text"> on %s</span>', 'testscores' ), array( 'span' => array( 'class' => array() ) ) ), get_the_title() ) );
-		echo '</span>';
-	}
+//	if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
+//		echo '<span class="comments-link">';
+//		/* translators: %s: post title */
+//		comments_popup_link( sprintf( wp_kses( __( 'Leave a Comment<span class="screen-reader-text"> on %s</span>', 'testscores' ), array( 'span' => array( 'class' => array() ) ) ), get_the_title() ) );
+//		echo '</span>';
+//	}
 
 	edit_post_link(
 		sprintf(
@@ -120,3 +133,57 @@ function testscores_category_transient_flusher() {
 }
 add_action( 'edit_category', 'testscores_category_transient_flusher' );
 add_action( 'save_post',     'testscores_category_transient_flusher' );
+
+
+/**
+ * Utility function to check if a gravatar exists for a given email or id
+ * @param int|string|object $id_or_email A user ID,  email address, or comment object
+ * @return bool if the gravatar exists or not
+ */
+
+function testscores_validate_gravatar($id_or_email) {
+  //id or email code borrowed from wp-includes/pluggable.php
+	$email = '';
+	if ( is_numeric($id_or_email) ) {
+		$id = (int) $id_or_email;
+		$user = get_userdata($id);
+		if ( $user )
+			$email = $user->user_email;
+	} elseif ( is_object($id_or_email) ) {
+		// No avatar for pingbacks or trackbacks
+		$allowed_comment_types = apply_filters( 'get_avatar_comment_types', array( 'comment' ) );
+		if ( ! empty( $id_or_email->comment_type ) && ! in_array( $id_or_email->comment_type, (array) $allowed_comment_types ) )
+			return false;
+
+		if ( !empty($id_or_email->user_id) ) {
+			$id = (int) $id_or_email->user_id;
+			$user = get_userdata($id);
+			if ( $user)
+				$email = $user->user_email;
+		} elseif ( !empty($id_or_email->comment_author_email) ) {
+			$email = $id_or_email->comment_author_email;
+		}
+	} else {
+		$email = $id_or_email;
+	}
+
+	$hashkey = md5(strtolower(trim($email)));
+	$uri = 'http://www.gravatar.com/avatar/' . $hashkey . '?d=404';
+
+	$data = wp_cache_get($hashkey);
+	if (false === $data) {
+		$response = wp_remote_head($uri);
+		if( is_wp_error($response) ) {
+			$data = 'not200';
+		} else {
+			$data = $response['response']['code'];
+		}
+	    wp_cache_set($hashkey, $data, $group = '', $expire = 60*5);
+
+	}		
+	if ($data == '200'){
+		return true;
+	} else {
+		return false;
+	}
+}
